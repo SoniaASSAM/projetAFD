@@ -73,10 +73,29 @@ def taux_bonne_classif(classif) :
             'svm' : len(classif[classif['class'] == classif.prediction_svm])/n,
             'neuronal_net' : len(classif[classif['class'] == classif.prediction_neuronal_net])/n}
 
-
+#Donnees générées
 init_classif(Xtest_0, Xtest_1)
 y = np.hstack((np.zeros(len(Xapp_0)), np.ones(len(Xapp_1))))
 Xtest = classif.as_matrix(['x1','x2'])
+classif['prediction_svm'] = testSVM(Xtest)
+classif['prediction_neuronal_net'] = test_neuronal_network(Xtest)
+classif['prediction_lda'] = test_lda(Xtest)
+print(taux_bonne_classif(classif))
+#Jeu de données choisi 
+jdd = pds.DataFrame.from_csv("haberman.csv", header=None).reset_index()
+n = len(jdd)
+napp = int(0.8 * n)
+jdd = jdd.rename(columns={0:'x1', 1:"x2",2:'x3',3:'class'})
+Xapp = jdd.loc[:napp]#.as_matrix(['x1','x2','x3'])
+Xapp_0 = Xapp[Xapp['class'] == 2].as_matrix(['x1','x2','x3'])
+Xapp_1 = Xapp[Xapp['class'] == 1].as_matrix(['x1','x2','x3'])
+Xtest = jdd.loc[napp:]
+Xtest_0 = Xtest[Xtest['class'] == 2].as_matrix(['x1','x2','x3'])
+Xtest_1 = Xtest[Xtest['class'] == 1].as_matrix(['x1','x2','x3'])
+y = np.hstack((np.zeros(len(Xapp_0)), np.ones(len(Xapp_1))))
+Xapp = np.concatenate((Xapp_0,Xapp_1))
+init_classif(Xtest_0,Xtest_1)
+Xtest = np.concatenate((Xtest_0,Xtest_1))
 classif['prediction_svm'] = testSVM(Xtest)
 classif['prediction_neuronal_net'] = test_neuronal_network(Xtest)
 classif['prediction_lda'] = test_lda(Xtest)

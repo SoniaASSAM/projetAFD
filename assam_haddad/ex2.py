@@ -207,8 +207,8 @@ if __name__ == '__main__' :
     #Résultats différents
     print("Taux de bonne clasification : "+
           str(taux_bonne_classif(classifApp)))
-    print("Frontiere décision avant")
-    print_decision_boundary(Xapp_0,Xapp_1)
+    #print("Frontiere décision avant")
+    #print_decision_boundary(Xapp_0,Xapp_1)
     #Question 2
     print("Question 2 : ")
     Xapp_0[0] = [-10,-10]
@@ -223,16 +223,17 @@ if __name__ == '__main__' :
           +str(np.array_equal(res_skn2,res_impl2)))
     print("Taux de bonne clasification : "+
           str(taux_bonne_classif(classifApp)))
-    print(classifApp)
-    print("frontiere apres")
-    print_decision_boundary(Xapp_0,Xapp_1)
+    #print(classifApp)
+    #print("frontiere apres")
+    #print_decision_boundary(Xapp_0,Xapp_1)
     #Même résultats que précedents ?
     #TODO Pourquoi ?
     #Question3
     print("Question 3 : ")
     print("Frontière de décision: ")
-    print_decision_boundary(Xtest_0,Xtest_1)
+    print_decision_boundary(Xapp_0,Xapp_1)
     #TODO Question4
+    #Faire éloigner la cov mettre exemple 10 5 5 10 => On aura des taux de bonnes classif à 60%
     #Question 5
     #Pour lambda = 1 On se retrouve avec les parametres de LDA
     print("Question 5 :")
