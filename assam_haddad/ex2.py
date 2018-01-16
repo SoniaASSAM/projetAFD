@@ -86,18 +86,16 @@ def LDA(X) :
     global classifApp
     res = []
     global Xapp
-    global sigma
+    update_mu()
+    update_sigma()
     for i in range(len(X)) : #Données de tests à classer par rapport aux données d'apprentissage
         Xapp = classifApp.as_matrix(['x1','x2'])
-        update_mu()
         update_pi()
-        update_sigma()
         c = naive_bayes(X[i])
         res.append(c)
         classifTest.loc[i,['x1','x2']] = X[i][0], X[i][1]
         classifTest.loc[i, 'prediction_lda'] = c
         classifApp = classifApp.append(classifTest.iloc[i], ignore_index=True)
-       
     return res
 
 
@@ -126,8 +124,8 @@ def delta(k,x) :
     sigma_inversee = np.linalg.inv(sigma)
     uk = np.matrix(mu[k]).T
     #print(x.T*sigma_inversee*uk -1/2*mu[k]*sigma_inversee*uk)
-    #p1 = np.transpose(x - 0.5 * uk) * sigma_inversee * uk
-    p1 = x.T*sigma_inversee*uk -1/2*mu[k]*sigma_inversee*uk    
+    p1 = np.transpose(x - 0.5 * uk) * sigma_inversee * uk
+    #p1 = x.T*sigma_inversee*uk -1/2*mu[k]*sigma_inversee*uk    
     log = math.log(pi[k])
     
     return p1 + log
@@ -138,7 +136,10 @@ def decision_boundary(sigma,mu) :
     u = [i.reshape(1,2).T for i in mu]
     w = sigma_inversee * (u[0] - u[1])
     b = (u[0] - u[1]).T * sigma_inversee * (u[0] + u[1]) / 2 - math.log(pi[0]/pi[1])
-    return np.linalg.tensorsolve(w,b)
+    xx = [0,-b/w[0]]
+    yy = [-b/w[1],0]
+    plt.plot(xx, yy, 'r-')
+    plt.show()
 
 
 def init_classifApp() :
@@ -150,8 +151,8 @@ def init_classifApp() :
     
     classifApp0['x1'] = classifApp0.apply(lambda x : Xapp_0[x.name][0], axis=1)
     classifApp0['x2'] = classifApp0.apply(lambda x : Xapp_0[x.name][1], axis=1)
-    classifApp1['x1'] = classifApp0.apply(lambda x : Xapp_1[x.name][0], axis=1)
-    classifApp1['x2'] = classifApp0.apply(lambda x : Xapp_1[x.name][1], axis=1)
+    classifApp1['x1'] = classifApp1.apply(lambda x : Xapp_1[x.name][0], axis=1)
+    classifApp1['x2'] = classifApp1.apply(lambda x : Xapp_1[x.name][1], axis=1)
     classifApp = classifApp0.append(classifApp1, ignore_index=True)
     classifApp['prediction_lda'] = [naive_bayes(i) for i in Xapp]
     classifApp['prediction_skn'] = None
@@ -193,7 +194,7 @@ Xtest = np.concatenate((Xtest_0,Xtest_1))
 
 if __name__ == '__main__' :
     #Question 1
-   
+    
     print("Question 1 : ")
     init_classifApp()
     init_classifTest()
@@ -203,7 +204,6 @@ if __name__ == '__main__' :
     classifApp['prediction_skn'] = skn(classifApp.as_matrix(['x1','x2']))
     print("Résultats identitques ? "
           +str(np.array_equal(res_skn,res_impl)))
-
     #Résultats différents
     print("Taux de bonne clasification : "+
           str(taux_bonne_classif(classifApp)))
@@ -223,6 +223,7 @@ if __name__ == '__main__' :
           +str(np.array_equal(res_skn2,res_impl2)))
     print("Taux de bonne clasification : "+
           str(taux_bonne_classif(classifApp)))
+    print(classifApp)
     print("frontiere apres")
     print_decision_boundary(Xapp_0,Xapp_1)
     #Même résultats que précedents ?
