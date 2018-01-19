@@ -58,12 +58,12 @@ def init_classif(X0,X1) :
 def testSVM(X) :
     clf = svm.SVC(kernel='linear', C = 1.0)
     clf.fit(Xapp,y)
-    w = clf.coef_[0]
-    a = -w[0] / w[1]
-    xx = np.linspace(-5, 5)
-    yy = a * xx - (clf.intercept_[0]) / w[1]
-    plt.plot(xx, yy, 'k-')
-    plt.show()
+#    w = clf.coef_[0]
+#    a = -w[0] / w[1]
+#    xx = np.linspace(-5, 5)
+#    yy = a * xx - (clf.intercept_[0]) / w[1]
+#    plt.plot(xx, yy, 'k-')
+#    plt.show()
     return clf.predict(X)
     
 #Fonction classification avec méthode de Réseau de Neurones  
@@ -109,12 +109,9 @@ y = np.hstack((np.zeros(len(Xapp_0)), np.ones(len(Xapp_1))))
 Xtest = classif.as_matrix(['x1','x2'])
 classif['prediction_svm'] = testSVM(Xtest)
 
-print_decision_boundary(Xtest_0,Xtest_1)
 classif['prediction_neuronal_net'] = test_neuronal_network(Xtest)
 
-print_decision_boundary(Xtest_0,Xtest_1)
 classif['prediction_lda'] = test_lda(Xtest)
-print_decision_boundary(Xtest_0,Xtest_1)
 
 #Print results
 print("## Résultats de classification avec données synthétiques : \n")
@@ -144,7 +141,6 @@ Xapp = np.concatenate((Xapp_0,Xapp_1))
 init_classif(Xtest_0,Xtest_1)
 Xtest = np.concatenate((Xtest_0,Xtest_1))
 classif['prediction_svm'] = testSVM(Xtest)
-
 classif['prediction_neuronal_net'] = test_neuronal_network(Xtest)
 classif['prediction_lda'] = test_lda(Xtest)
 

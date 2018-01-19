@@ -21,7 +21,7 @@ k = 2
 mu0 = np.array([0,0])
 mu1 = np.array([3,2])
 mu = [mu0,mu1]
-sigma = np.matrix([[1,0.5], [0.5, 1]])
+sigma = np.matrix([[0.5,0.25], [0.25, 0.5]])
 pi = [1/2,1/2]
 n1 = 10
 n2 = 10
@@ -79,6 +79,7 @@ def var_LDA(x, lmbda) :
 
 ########### Fonction calculant le taux de bonne classificatio ###################
 def taux_bonne_classif(df) :
+    
     return {'skn' : len(df[df['class']==df.prediction_skn]) / len(df),
             'lda' : len(df[df['class']==df.prediction_lda]) / len(df)}
     
@@ -255,9 +256,9 @@ if __name__ == '__main__' :
     ############## Question 2 & 3 ####################
     print("\n\n\n ##Question 2 : ")
    
-    Xapp_0 = ex1.dataGenerator(mu[0],sigma,10)
-    Xapp_1 = ex1.dataGenerator(mu[1],sigma,10)
-    Xapp = np.concatenate((Xapp_0,Xapp_1))
+    Xapp = classifApp[:20]
+    Xapp_0 = Xapp[classifApp["class"] == 0].as_matrix(["x1","x2"])
+    Xapp_1 = Xapp[classifApp["class"] == 1].as_matrix(["x1","x2"])
     Xapp_0[0] = [-10,-10]
     Xapp = np.concatenate((Xapp_0,Xapp_1))
     init_classifApp()
@@ -266,11 +267,6 @@ if __name__ == '__main__' :
     update_mu()
     update_sigma()
     pi = [1/2,1/2]
-    Xtest_0 = ex1.dataGenerator(mu[0],sigma,1000)
-    Xtest_1 = ex1.dataGenerator(mu[1],sigma,1000)
-    Xtest = np.concatenate((Xtest_0,Xtest_1))
-
-    init_classifTest()
     res_impl2 = LDA(Xtest)
     res_skn2 = skn(Xtest)
     classifApp.loc[20:,['prediction_skn']] = res_skn2
@@ -284,6 +280,7 @@ if __name__ == '__main__' :
           +str(np.array_equal(res_skn2,res_impl2)))
      
     print("\n - Frontière de décision Q2")
+    
     print_decision_boundary(Xapp_0,Xapp_1)
     print_decision_boundary(Xtest_0,Xtest_1)
 
@@ -316,26 +313,22 @@ if __name__ == '__main__' :
     pas = 0.1
     lmbdas = []
     #Données d'apprentissage
-    app_0 = ex1.dataGenerator(mu[0],sigma,10)
-    app_1 = ex1.dataGenerator(mu[1],sigma,10)
-    app = np.concatenate((app_0,app_1))
-    tst_0 = ex1.dataGenerator(mu[0],sigma,1000)
-    tst_1 = ex1.dataGenerator(mu[1],sigma,1000)
-    tst = np.concatenate((tst_0,tst_1))
+    app = Xapp
+    tst = Xtest
     for i in range(11) :
-        print(i)
+        lmbdas.append(i*pas)
+        var_LDA(Xtest,i*pas)
+        taux.append(taux_bonne_classif(classifApp)['lda'])
         Xapp = app
         Xtest = tst
+        
+        init_classifApp()
+        init_classifTest()
         mu0 = np.array([0,0])
         mu1 = np.array([3,2])
         mu = [mu0,mu1]
         sigma = np.matrix([[1,0.5], [0.5, 1]])
         pi = [1/2,1/2]
-        init_classifApp()
-        init_classifTest()
-        lmbdas.append(i*pas)
-        var_LDA(Xtest,i*pas)
-        taux.append(taux_bonne_classif(classifApp)['lda'])
-    plt.plot(lmbdas,taux)
+    plt.scatter(lmbdas,taux)
     plt.title("Taux de bonne classification en fonction de lambdas")
     plt.show()
